@@ -11,7 +11,7 @@ namespace GymStore1
         private BindingSource bindingSource = new BindingSource();
         private User selectedUser = null;
         private int currentPage = 1;
-        private int pageSize = 10;
+        private int pageSize = 20;
         private int totalPages = 1;
         private Label lblPage;
         private Button btnPrev;
@@ -55,8 +55,9 @@ namespace GymStore1
             dgv.MultiSelect = false;
             bindingSource.DataSource = users;
             dgv.DataSource = bindingSource;
+            if (dgv.Columns["Id"] != null) dgv.Columns["Id"].Visible = false;
+            if (dgv.Columns["UserImage"] != null) dgv.Columns["UserImage"].Visible = false;
             // Set Vietnamese header text
-            if (dgv.Columns["Id"] != null) dgv.Columns["Id"].HeaderText = "#No";
             if (dgv.Columns["Name"] != null) dgv.Columns["Name"].HeaderText = "Tên";
             if (dgv.Columns["PhoneNumber"] != null) dgv.Columns["PhoneNumber"].HeaderText = "Số điện thoại";
             if (dgv.Columns["RegisteredAt"] != null) dgv.Columns["RegisteredAt"].HeaderText = "Ngày đăng ký";
@@ -109,97 +110,82 @@ namespace GymStore1
 
             // Clear panel controls and set up layout
             panel.Controls.Clear();
-            panel.FlowDirection = FlowDirection.TopDown;
-            panel.WrapContents = false;
-            panel.AutoSize = true;
+            panel.Height = 70;
+            panel.Dock = DockStyle.Bottom;
+            panel.AutoSize = false;
             panel.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            panel.Dock = DockStyle.Top;
 
-            // Create a main vertical panel for centering (search + pagination)
-            var panelMain = new FlowLayoutPanel {
-                FlowDirection = FlowDirection.TopDown,
-                WrapContents = false,
-                AutoSize = true,
+            var tablePanel = new TableLayoutPanel {
+                RowCount = 1,
+                ColumnCount = 3,
+                Dock = DockStyle.Fill,
+                AutoSize = false,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Dock = DockStyle.None,
-                Anchor = AnchorStyles.None,
-                Padding = new Padding(0, 10, 0, 10)
+                Height = 70
             };
+            tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
+            tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 34F));
+            tablePanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 33F));
 
-            
-
-            // Add the main panel to the form panel (top)
-            panel.Controls.Add(panelMain);
-
-            // Create a new bottomPanel for the footer
-            var bottomPanel = new Panel {
-                Dock = DockStyle.Bottom,
-                Height = 60
-            };
-            // Search row at bottom left
-            var searchRow = new FlowLayoutPanel {
+            var leftPanel = new FlowLayoutPanel {
                 FlowDirection = FlowDirection.LeftToRight,
+                Dock = DockStyle.Fill,
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Dock = DockStyle.Left,
-                Anchor = AnchorStyles.Left,
                 Padding = new Padding(10, 10, 0, 10)
-            };
-            var txtSearch = new TextBox {
-                Width = 200,
-                Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point),
-                PlaceholderText = "Tìm theo tên hoặc số điện thoại"
-            };
-            var btnSearch = new Button {
-                Text = "Tìm kiếm",
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Padding = new Padding(10, 5, 10, 5),
-                Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
-            };
-            searchRow.Controls.Add(txtSearch);
-            searchRow.Controls.Add(btnSearch);
-            bottomPanel.Controls.Add(searchRow);
-            // Pagination and action buttons at bottom right
-            var rightRow = new FlowLayoutPanel {
-                FlowDirection = FlowDirection.LeftToRight,
-                AutoSize = true,
-                AutoSizeMode = AutoSizeMode.GrowAndShrink,
-                Dock = DockStyle.Right,
-                Anchor = AnchorStyles.Right,
-                Padding = new Padding(0, 10, 10, 10)
             };
             btnPrev = new Button {
                 Text = "Trước",
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Padding = new Padding(10, 5, 10, 5),
-                Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
+                Font = new System.Drawing.Font("Segoe UI", 10F)
+            };
+            btnPrev.Click += (s, e) => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    UpdatePage();
+                }
             };
             btnNext = new Button {
                 Text = "Sau",
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Padding = new Padding(10, 5, 10, 5),
-                Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
+                Font = new System.Drawing.Font("Segoe UI", 10F)
+            };
+            btnNext.Click += (s, e) => {
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    UpdatePage();
+                }
             };
             lblPage = new Label {
                 Text = $"Trang {currentPage} / {totalPages}",
                 AutoSize = false,
-                Width = 150,
+                Width = 120,
                 Height = 40,
                 TextAlign = System.Drawing.ContentAlignment.MiddleCenter,
-                Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point)
+                Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Bold)
             };
-            rightRow.Controls.Add(btnPrev);
-            rightRow.Controls.Add(lblPage);
-            rightRow.Controls.Add(btnNext);
+            leftPanel.Controls.Add(btnPrev);
+            leftPanel.Controls.Add(lblPage);
+            leftPanel.Controls.Add(btnNext);
+            tablePanel.Controls.Add(leftPanel, 0, 0);
+
+            var centerPanel = new FlowLayoutPanel {
+                FlowDirection = FlowDirection.LeftToRight,
+                Dock = DockStyle.Fill,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Padding = new Padding(0, 10, 0, 10)
+            };
             var btnAdd = new Button {
                 Text = "Thêm KH",
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Padding = new Padding(10, 5, 10, 5),
-                Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
+                Font = new System.Drawing.Font("Segoe UI", 10F)
             };
             btnAdd.Click += (s, e) => {
                 using var form = new UserForm();
@@ -208,13 +194,13 @@ namespace GymStore1
                     RefreshUsers();
                 }
             };
-            rightRow.Controls.Add(btnAdd);
+            centerPanel.Controls.Add(btnAdd);
             var btnEdit = new Button {
                 Text = "Sửa KH",
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Padding = new Padding(10, 5, 10, 5),
-                Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point)
+                Font = new System.Drawing.Font("Segoe UI", 10F)
             };
             btnEdit.Click += (s, e) => {
                 if (selectedUser != null) {
@@ -225,13 +211,13 @@ namespace GymStore1
                     }
                 }
             };
-            rightRow.Controls.Add(btnEdit);
+            centerPanel.Controls.Add(btnEdit);
             var btnDelete = new Button {
                 Text = "Xóa KH",
                 AutoSize = false,
                 Size = new System.Drawing.Size(110, 40),
                 Padding = new Padding(10, 5, 10, 5),
-                Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point),
+                Font = new System.Drawing.Font("Segoe UI", 10F),
                 TextAlign = System.Drawing.ContentAlignment.MiddleCenter
             };
             btnDelete.Click += (s, e) => {
@@ -243,10 +229,28 @@ namespace GymStore1
                     }
                 }
             };
-            rightRow.Controls.Add(btnDelete);
-            bottomPanel.Controls.Add(rightRow);
-            Controls.Add(bottomPanel);
+            centerPanel.Controls.Add(btnDelete);
+            tablePanel.Controls.Add(centerPanel, 1, 0);
 
+            var rightPanel = new FlowLayoutPanel {
+                FlowDirection = FlowDirection.LeftToRight,
+                Dock = DockStyle.Right,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Padding = new Padding(0, 10, 20, 10)
+            };
+            var txtSearch = new TextBox {
+                Width = 200,
+                Font = new System.Drawing.Font("Segoe UI", 10F),
+                PlaceholderText = "Tìm theo tên hoặc số điện thoại"
+            };
+            var btnSearch = new Button {
+                Text = "Tìm kiếm",
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Padding = new Padding(10, 5, 10, 5),
+                Font = new System.Drawing.Font("Segoe UI", 10F)
+            };
             btnSearch.Click += (s, e) => {
                 var keyword = txtSearch.Text.Trim().ToLower();
                 if (string.IsNullOrEmpty(keyword)) {
@@ -259,6 +263,11 @@ namespace GymStore1
                 totalPages = (int)Math.Ceiling(users.Count / (double)pageSize);
                 UpdatePage();
             };
+            rightPanel.Controls.Add(txtSearch);
+            rightPanel.Controls.Add(btnSearch);
+            tablePanel.Controls.Add(rightPanel, 2, 0);
+
+            panel.Controls.Add(tablePanel);
 
             dgv.AllowUserToOrderColumns = true;
 
@@ -321,6 +330,7 @@ namespace GymStore1
                     }
                 }
             };
+	
 
             RefreshUsers();
         }

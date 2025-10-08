@@ -10,5 +10,6 @@ namespace GymStore1
         public DateTime RegisteredAt { get; set; }
         public DateTime ExpiredAt { get; set; }
         public decimal MoneyPerMonth { get; set; }
+        public string UserImage { get; set; } // Path to user image
     }
 }

@@ -29,28 +29,28 @@
         private void InitializeComponent()
         {
             dgvUsers = new DataGridView();
-            panel = new FlowLayoutPanel();
+            panel = new Panel();
             ((System.ComponentModel.ISupportInitialize)dgvUsers).BeginInit();
             SuspendLayout();
             // 
             // dgvUsers
             // 
             dgvUsers.ColumnHeadersHeight = 29;
-            dgvUsers.Dock = DockStyle.Top;
+            dgvUsers.Dock = DockStyle.Fill;
             dgvUsers.Location = new Point(0, 0);
             dgvUsers.Name = "dgvUsers";
             dgvUsers.ReadOnly = true;
             dgvUsers.RowHeadersWidth = 51;
-            dgvUsers.Size = new Size(995, 600); // Increase height for larger list view
+            dgvUsers.Size = new Size(995, 600); // Remove fixed height for Fill
             dgvUsers.TabIndex = 1;
             dgvUsers.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             // 
             // panel
             // 
-            panel.Dock = DockStyle.Top;
-            panel.Location = new Point(0, 600);
+            panel.Dock = DockStyle.Bottom;
+            panel.Location = new Point(0, 671); // 741 - 70
             panel.Name = "panel";
-            panel.Size = new Size(995, 140);
+            panel.Size = new Size(995, 70); // Set smaller height for bottom controls
             panel.TabIndex = 0;
             // 
             // Form1
@@ -69,6 +69,6 @@
         #endregion
 
         private System.Windows.Forms.DataGridView dgvUsers;
-        private System.Windows.Forms.FlowLayoutPanel panel;
+        private System.Windows.Forms.Panel panel;
     }
 }
